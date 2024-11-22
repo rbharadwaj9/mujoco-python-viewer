@@ -133,6 +133,7 @@ class MujocoViewer(Callbacks):
         # overlay, markers
         self._overlay = {}
         self._markers = []
+        self._arrows = []
 
     def add_line_to_fig(self, line_name, fig_idx=0):
         assert isinstance(line_name, str), \
@@ -229,6 +230,35 @@ class MujocoViewer(Callbacks):
         self.scn.ngeom += 1
 
         return
+
+    def add_arrow(self, **arrow_params):
+        self._arrows.append(arrow_params)
+
+    def _add_arrow_to_scene(self, arrow):
+        if self.scn.ngeom >= self.scn.maxgeom:
+            return
+        self.scn.ngeom += 1
+
+        default_rgba = np.array([1, 0, 0, 1])
+        rgba = []
+
+        if "color" in arrow.keys():
+            rgba = arrow["color"]
+        else:
+            rgba = default_rgba
+
+
+        mujoco.mjv_initGeom(self.scn.geoms[self.scn.ngeom-1],
+                            mujoco.mjtGeom.mjGEOM_ARROW, np.zeros(3),
+                            np.zeros(3), np.zeros(9), rgba.astype(np.float32))
+
+        mujoco.mjv_connector(self.scn.geoms[self.scn.ngeom-1],
+                             int(mujoco.mjtGeom.mjGEOM_ARROW), 0.001,
+                             arrow["start"], arrow["end"])
+
+    def clear_arrows(self):
+        # clear arrows
+        self._arrows[:] = []
 
     def _create_overlay(self):
         topleft = mujoco.mjtGridPos.mjGRID_TOPLEFT
@@ -411,6 +441,11 @@ class MujocoViewer(Callbacks):
                 # marker items
                 for marker in self._markers:
                     self._add_marker_to_scene(marker)
+
+                # arrow items
+                for arrow in self._arrows:
+                    self._add_arrow_to_scene(arrow)
+
                 # render
                 mujoco.mjr_render(self.viewport, self.scn, self.ctx)
                 # overlay items

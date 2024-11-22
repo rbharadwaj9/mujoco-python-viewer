@@ -16,7 +16,7 @@ setup(
     version=VERSION,
     author='Rohan P. Singh',
     author_email='rohan565singh@gmail.com',
-    url='https://github.com/rohanpsingh/mujoco-python-viewer',
+    url='https://github.com/rbharadwaj9/mujoco-python-viewer',
     description='Interactive renderer for MuJoCo Python',
     long_description='Interactive renderer for MuJoCo Python',
     install_requires=INSTALL_REQUIRES,
